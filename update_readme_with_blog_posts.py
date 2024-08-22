@@ -27,12 +27,15 @@ with open("posts_cache.txt", "a") as file:
 if new_posts:
     markdown_content = "\n".join([f"- [{post['title']}]({post['url']})" for post in new_posts])
 
+    # Add the section header
+    section_header = "## ✍️ Latest Blog Posts\n"
+
     # Update README.md
     with open("README.md", "r") as file:
         readme_content = file.read()
 
     # Replace the content between the placeholders
-    new_content = readme_content.replace("<!-- blog start -->", f"<!-- blog start -->\n{markdown_content}")
+    new_content = readme_content.replace("<!-- blog start -->", f"<!-- blog start -->\n{section_header}\n{markdown_content}")
 
     with open("README.md", "w") as file:
         file.write(new_content)
