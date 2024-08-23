@@ -5,9 +5,12 @@ import os
 rss_url = "https://v2.velog.io/rss/@freesky"
 feed = feedparser.parse(rss_url)
 
-# Read the cache file
-if os.path.exists("posts_cache.txt"):
-    with open("posts_cache.txt", "r") as file:
+# Cache file to store previously added post URLs
+cache_file = "posts_cache.txt"
+
+# Read the cache file, or create it if it doesn't exist
+if os.path.exists(cache_file):
+    with open(cache_file, "r") as file:
         cached_posts = file.read().splitlines()
 else:
     cached_posts = []
@@ -18,8 +21,12 @@ latest_posts = [{"title": entry.title, "url": entry.link} for entry in feed.entr
 # Filter out posts that are already in the cache
 new_posts = [post for post in latest_posts if post["url"] not in cached_posts]
 
+# Debugging: Print cached and new posts to verify the logic
+print("Cached Posts:", cached_posts)
+print("New Posts to Add:", new_posts)
+
 # Update the cache with the new posts
-with open("posts_cache.txt", "a") as file:
+with open(cache_file, "a") as file:
     for post in new_posts:
         file.write(post["url"] + "\n")
 
@@ -34,7 +41,7 @@ if new_posts:
     with open("README.md", "r") as file:
         readme_content = file.read()
 
-    # Replace the content between the placeholders
+    # Replace the content between the placeholders, keeping existing content below the header
     new_content = readme_content.replace("<!-- blog start -->", f"<!-- blog start -->\n{section_header}\n{markdown_content}")
 
     with open("README.md", "w") as file:
