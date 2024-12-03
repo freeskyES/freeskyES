@@ -35,4 +35,5 @@ jobs:
       run: |
         git config --local user.email "freesky111@naver.com"
         git config --local user.name "freeskyES"
+        git pull origin main --rebase
         git diff --exit-code || (git add README.md && git commit -m "Update README with latest blog posts" && git push)
