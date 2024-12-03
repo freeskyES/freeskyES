@@ -41,10 +41,22 @@ if new_posts:
     with open("README.md", "r") as file:
         readme_content = file.read()
 
-    # Replace the content between the placeholders, keeping existing content below the header
-    new_content = readme_content.replace("<!-- blog start -->", f"<!-- blog start -->\n{section_header}\n{markdown_content}")
+    # Replace the content between the placeholders
+    start_marker = "<!-- blog start -->"
+    end_marker = "<!-- blog end -->"
+    start_idx = readme_content.find(start_marker) + len(start_marker)
+    end_idx = readme_content.find(end_marker)
 
-    with open("README.md", "w") as file:
-        file.write(new_content)
+    if start_idx != -1 and end_idx != -1:
+        updated_content = (
+            readme_content[:start_idx]
+            + f"\n{section_header}\n{markdown_content}\n"
+            + readme_content[end_idx:]
+        )
+
+        with open("README.md", "w") as file:
+            file.write(updated_content)
+    else:
+        print("Error: Markers not found in README.md")
 else:
     print("No new posts to add.")
