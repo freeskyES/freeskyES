@@ -18,9 +18,9 @@ if os.path.exists(cache_file):
 else:
     cached_posts = []
 
-# Extract the latest posts with titles
+# Extract the latest posts
 latest_posts = [
-    {"title": entry.title if hasattr(entry, "title") else "Untitled", "url": entry.link}
+    {"title": entry.title, "url": entry.link}
     for entry in feed.entries[:5]
 ]
 
