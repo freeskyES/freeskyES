@@ -60,5 +60,3 @@ if new_posts:
         print("Error: Markers not found in README.md")
 else:
     print("No new posts to add.")
-
-이건 제목이 나와
