@@ -5,6 +5,9 @@ import os
 rss_url = "https://v2.velog.io/rss/@freesky"
 feed = feedparser.parse(rss_url)
 
+# Debugging: Print RSS data structure for verification
+print("Sample RSS Entry:", feed.entries[:1])  # 첫 번째 항목 확인
+
 # Cache file to store previously added post URLs
 cache_file = "posts_cache.txt"
 
@@ -15,13 +18,14 @@ if os.path.exists(cache_file):
 else:
     cached_posts = []
 
-# Extract the latest posts
-latest_posts = [{"title": entry.title, "url": entry.link} for entry in feed.entries[:5]]
+# Extract the latest posts with titles
+latest_posts = [
+    {"title": entry.title if hasattr(entry, "title") else "Untitled", "url": entry.link}
+    for entry in feed.entries[:5]
+]
 
 # Combine cached and latest posts, ensuring no duplicates
 all_posts = {post["url"]: post for post in latest_posts + [{"title": "", "url": url} for url in cached_posts]}
-
-# Keep only the latest 5 posts
 latest_five_posts = list(all_posts.values())[:5]
 
 # Debugging: Print combined posts
@@ -33,7 +37,9 @@ with open(cache_file, "w") as file:
         file.write(post["url"] + "\n")
 
 # Generate markdown for the latest 5 posts
-markdown_content = "\n".join([f"- [{post['title']}]({post['url']})" for post in latest_five_posts])
+markdown_content = "\n".join([
+    f"- [{post['title']}]({post['url']})" for post in latest_five_posts
+])
 
 # Add the section header
 section_header = "## ✍️ Latest Blog Posts\n"
