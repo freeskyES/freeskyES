@@ -7,6 +7,5 @@
 <!-- blog start -->
 ## ✍️ Latest Blog Posts
 
-- [Binary tree - BFS](https://velog.io/@freesky/Binary-tree-BFS)
-- [Garbage Collection(GC)](https://velog.io/@freesky/GC)
+- [Graphs - BFS](https://velog.io/@freesky/Graphs-BFS)
 <!-- blog end -->
