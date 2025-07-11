@@ -1,47 +1,57 @@
 import feedparser
 import os
 
-# Fetch Velog RSS feed
+# Velog RSS 피드 URL
 rss_url = "https://v2.velog.io/rss/@freesky"
 feed = feedparser.parse(rss_url)
 
-# Cache file to store previously added post URLs
+# 캐시 파일
 cache_file = "posts_cache.txt"
 
-# Read the cache file, or create it if it doesn't exist
+# 캐시 읽기
 if os.path.exists(cache_file):
-    with open(cache_file, "r") as file:
+    with open(cache_file, "r", encoding="utf-8") as file:
         cached_posts = file.read().splitlines()
 else:
     cached_posts = []
 
-# Extract the latest posts
+# 최신 5개 포스트 추출
 latest_posts = [{"title": entry.title, "url": entry.link} for entry in feed.entries[:5]]
 
-# Filter out posts that are already in the cache
+# 캐시에 없는 새 포스트만 추출
 new_posts = [post for post in latest_posts if post["url"] not in cached_posts]
 
-# Debugging: Print cached and new posts to verify the logic
-print("Cached Posts:", cached_posts)
-print("New Posts to Add:", new_posts)
-
-# Update the cache with the new posts
-with open(cache_file, "a") as file:
+# 캐시 업데이트
+with open(cache_file, "a", encoding="utf-8") as file:
     for post in new_posts:
         file.write(post["url"] + "\n")
 
-# If there are new posts, update the README
-if new_posts:
-    markdown_content = "\n".join([f"- [{post['title']}]({post['url']})" for post in new_posts])
+# 뱃지 스타일로 변환 함수
+def make_badge(post):
+    # 뱃지에 들어갈 텍스트를 URL 인코딩
+    from urllib.parse import quote
+    title_encoded = quote(post["title"])
+    return (
+        f'<a href="{post["url"]}">'
+        f'<img src="https://img.shields.io/badge/{title_encoded}-20C997?style=flat-square&logo=velog&logoColor=white" alt="{post["title"]}" />'
+        f'</a>'
+    )
 
-    # Add the section header
-    section_header = "## ✍️ Latest Blog Posts\n"
+# README.md 업데이트
+if latest_posts:
+    badges_html = "\n  ".join([make_badge(post) for post in latest_posts])
+    new_section = (
+        '\n<h3 align="center">✍️ Latest Blog Posts</h3>\n\n'
+        '<p align="center">\n  '
+        f'{badges_html}\n'
+        '</p>\n'
+    )
 
-    # Update README.md
-    with open("README.md", "r") as file:
+    # README.md 읽기
+    with open("README.md", "r", encoding="utf-8") as file:
         readme_content = file.read()
 
-    # Replace the content between the placeholders
+    # 마커 찾기
     start_marker = "<!-- blog start -->"
     end_marker = "<!-- blog end -->"
     start_idx = readme_content.find(start_marker) + len(start_marker)
@@ -50,12 +60,12 @@ if new_posts:
     if start_idx != -1 and end_idx != -1:
         updated_content = (
             readme_content[:start_idx]
-            + f"\n{section_header}\n{markdown_content}\n"
+            + new_section
             + readme_content[end_idx:]
         )
-
-        with open("README.md", "w") as file:
+        with open("README.md", "w", encoding="utf-8") as file:
             file.write(updated_content)
+        print("README.md updated with latest blog posts.")
     else:
         print("Error: Markers not found in README.md")
 else:
